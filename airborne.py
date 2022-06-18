@@ -51,15 +51,18 @@ def mpureadall():
 bus = smbus.SMBus(1)
 MPU_Init()
 
-
-port = 1
-bus2 = smbus2.SMBus(port)
 calpars = bme280.load_calibration_params(bus,BME_ADR)
-
-
 
 gpsp = "/dev/ttyAMA0"
 ser = serial.Serial(gpsp, baudrate = 9600)
+
+def bmereadall():
+	data = bme280.sample(bus2,BME_ADR,calpars)
+	res = []
+	res.append(round(data.temperature,2))
+	res.append(round(data.pressure,2))
+	return(res)
+
 
 def readgps(rawop=False):
 	val = ser.readline()
@@ -84,15 +87,6 @@ def readgps(rawop=False):
 def senddata(text):
 	ser.write(bytes(f"{text}\n","ASCII"))
 
-def bmereadall():
-	data = bme280.sample(bus2,BME_ADR,calpars)
-	file = open("/home/LOG/bmeop.txt","a")
-	file.write(str(data))
-	file.close()
-	res = []
-	res.append(round(data.temperature,2))
-	res.append(round(data.pressure,2))
-	return(res)
 
 MTP = 15
 barmes = []
@@ -113,7 +107,7 @@ while (mpures[1] > -1.3 and gpsdat[0] == "GPS: N/A"):
 	except OSError:
 		senddata("Check I2C connections")
 	gpsdat = readgps()
-	print(f"Ay :  {mpures}\t{bmeres}\t{gpsdat[1][2:-1]}",end='\r')
+	print(f"Ay :  {mpures}\t\t{gpsdat[1][2:-1]}",end='\r')
 	if not prept.is_alive():
 		prept = threading.Thread(target=sender)
 		prept.start()
