@@ -113,7 +113,7 @@ while (mpures[1] > -1.3 and gpsdat[0] == "GPS: N/A"):
 	except OSError:
 		senddata("Check I2C connections")
 	gpsdat = readgps()
-	print(f"Ay :  {mpures}\t\t{gpsdat[1][2:-1]}",end='\r')
+	print(f"Ay :  {mpures}\t{bmeres}\t{gpsdat[1][2:-1]}",end='\r')
 	if not prept.is_alive():
 		prept = threading.Thread(target=sender)
 		prept.start()
