@@ -61,6 +61,11 @@ def bmereadall():
 	res = []
 	res.append(round(data.temperature,2))
 	res.append(round(data.pressure,2))
+	res.append(data.humidity)
+	file = open("/home/LOG/test.txt","a")
+	file.write(str(data.humidity))
+	file.write("\n")
+	file.close()
 	return(res)
 
 
@@ -94,7 +99,7 @@ def sender():
 	global mpures
 	global gpsdat
 	senddata(f"{mpures}\t{bmeres}\t{gpsdat}")
-	sleep(3)
+	sleep(5)
 
 mpures = mpureadall()
 gpsdat = readgps()
