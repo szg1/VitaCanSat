@@ -57,7 +57,7 @@ gpsp = "/dev/ttyAMA0"
 ser = serial.Serial(gpsp, baudrate = 9600)
 
 def bmereadall():
-	data = bme280.sample(bus2,BME_ADR,calpars)
+	data = bme280.sample(bus,BME_ADR,calpars)
 	res = []
 	res.append(round(data.temperature,2))
 	res.append(round(data.pressure,2))
