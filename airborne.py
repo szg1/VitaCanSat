@@ -62,10 +62,10 @@ def bmereadall():
 	res.append(round(data.temperature,2))
 	res.append(round(data.pressure,2))
 	res.append(data.humidity)
-	file = open("/home/LOG/test.txt","a")
-	file.write(str(data.humidity))
-	file.write("\n")
-	file.close()
+#	file = open("/home/LOG/test.txt","a")
+#	file.write(str(data.humidity))
+#	file.write("\n")
+#	file.close()
 	return(res)
 
 
@@ -101,6 +101,21 @@ def sender():
 	senddata(f"{mpures}\t{bmeres}\t{gpsdat}")
 	sleep(5)
 
+def senddatamt():
+	global mpures
+	global gpsdat
+	global bmeres
+	while 1:
+		DAT = str(time_ns()-lasta) + "\t"
+		for i in bmeres:
+			DAT += str(i) + "\t"
+		for i in mpures:
+			DAT += str(i) + "\t"
+		barmes.append(bmeres[1])
+		#DAT += gpsdat[1]	
+		senddata(DAT)
+		sleep(0.4)
+
 mpures = mpureadall()
 gpsdat = readgps()
 prept = threading.Thread(target=sender)
@@ -118,30 +133,27 @@ while (mpures[1] > -1.3 and gpsdat[0] == "GPS: N/A"):
 		prept.start()
 
 lasta = time_ns()
+#mpudc = []
+
+senderthread = threading.Thread(target=senddatamt)
+senderthread.start()
+
 while True:
-	DAT = str(time_ns()-lasta) + "\t"
 	mpures = mpureadall()
 	bmeres = bmereadall()
 	gpsdat = readgps()
+#	mpudc.append(mpures)
+#	if not senderthread.is_alive():
+#		senderthread = threading.Thread(target=senddatamt)
+#		senderthread.start()
+	DAT = str(time_ns()-lasta) + "\t"
 	for i in bmeres:
 		DAT += str(i) + "\t"
 	for i in mpures:
 		DAT += str(i) + "\t"
 	barmes.append(bmeres[1])
 	DAT += gpsdat[1]
-
-#	print(DAT, end = '\r')
-	senddata(DAT)
-	file = open("/home/LOG/flightlog.raw", 'a')
+	file = open("/home/LOG/flight.txt", 'a')
 	file.write(DAT + "\n")
 	file.close()
-#	corvel = 1500 + mpures[4]*MTP
-#	if corvel > 2000:
-#		corvel = 2000
-#	if corvel < 1000:
-#		corvel = 1000
-	sleep(0.5)
-'''
-	except:
-		senddata("SHIT SHIT SHIT SHIT")
-'''
+
