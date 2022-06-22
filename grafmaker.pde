@@ -1,5 +1,5 @@
 String[] DATA = {};
-float[] temp1 = {}, pres = {}, ax = {}, ay = {}, az = {}, gx = {}, gy = {}, gz = {}, temp2 = {}, avgt = {};
+float[] temp1 = {}, pres = {}, ax = {}, ay = {}, az = {}, gx = {}, gy = {}, gz = {}, temp2 = {}, avgt = {}, alti = {};
 float LM;
 int XSIZE = 30000, YSIZE = 3000;
 
@@ -17,6 +17,9 @@ void setup()
     //println(templist[1] + "\t" + templist[2] + "\t" + templist[3] + "\t" + templist[4] + "\t" + templist[5] + "\t" + templist[6] + "\t" + templist[7] + "\t" + templist[8] + "\t" + templist[9] + "\t" + str((float(templist[1])+float(templist[9]))/2));
     temp1 = append(temp1, float(templist[1]));
     pres = append(pres, float(templist[2]));
+    float presdif = 1013 - float(templist[2]);
+    float prt = float(templist[2]) / (287*(float(templist[1])+273.15));
+    alti = append(alti, presdif/(prt*9.81));
     ax = append(ax, float(templist[4]));
     ay = append(ay, float(templist[5]));
     az = append(az, float(templist[6]));
@@ -28,6 +31,7 @@ void setup()
     //println(DATA.length);
     //println(i);
   }
+  printArray(alti);
   //println("DATA DONE");
   //TEMPERATURE GRAPH
   background(255);
@@ -291,6 +295,41 @@ void setup()
   text("Min: " + str(baromin) + "C         Max: " + str(baromax) + "C         Avarage: " + str(int(sum(pres)/pres.length*100)/100.0) + "C", 100, 1950);
   saveFrame("graph-pressure.png");
   println("baro done");
+  
+  //ALTITUDE
+  
+  background(255);
+  float altimax = max(alti);
+  float altimin = min(alti);
+  
+  //println(accsmax);
+  //println(altimin);
+  hm = (YSIZE*0.8)/(altimax-altimin);
+  //println(hm);
+  strokeWeight(5);
+  
+  println(altimin*hm);
+  println(altimax*hm);
+  
+  stroke(0, 80);
+  fill(0, 120);
+  textSize(80);
+  for (float i = 100*floor(altimin/100); i <= ceil(altimax); i+=(altimax-altimin)/10)
+  {
+    line(0, YSIZE*0.9-((i-altimin)*hm), width, YSIZE*0.9-((i-altimin)*hm));
+    text(str(i) + "hPa", 50, YSIZE*0.9+40-((i-altimin)*hm));
+  }
+  for (int i = 0; i < alti.length-1; i++)
+  {
+    stroke(#0dad00);
+    line(i*wm, YSIZE*0.9-((alti[i]-altimin)*hm), (i+1)*wm, YSIZE*0.9-((alti[i+1]-altimin)*hm));
+  }
+  stroke(0);
+  fill(0);
+  textSize(200);
+  text("Min: " + str(altimin) + "C         Max: " + str(altimax) + "C         Avarage: " + str(int(sum(alti)/alti.length*100)/100.0) + "C", 100, 1950);
+  saveFrame("graph-altitude.png");
+  println("alti done");
   
   
   exit();
